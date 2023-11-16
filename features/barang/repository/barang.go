@@ -1,4 +1,4 @@
-package model
+package repository
 
 import "gorm.io/gorm"
 
@@ -11,11 +11,11 @@ type BarangModel struct {
 }
 
 type BarangQuery struct {
-	DB *gorm.DB
+	db *gorm.DB
 }
 
 func (bq *BarangQuery) AddBarang(newBarang BarangModel) (BarangModel, error) {
-	if err := bq.DB.Create(&newBarang).Error; err != nil {
+	if err := bq.db.Create(&newBarang).Error; err != nil {
 		return BarangModel{}, err
 	}
 
