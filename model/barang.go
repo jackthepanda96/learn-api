@@ -9,3 +9,15 @@ type BarangModel struct {
 	Harga      int
 	UserID     uint
 }
+
+type BarangQuery struct {
+	DB *gorm.DB
+}
+
+func (bq *BarangQuery) AddBarang(newBarang BarangModel) (BarangModel, error) {
+	if err := bq.DB.Create(&newBarang).Error; err != nil {
+		return BarangModel{}, err
+	}
+
+	return newBarang, nil
+}

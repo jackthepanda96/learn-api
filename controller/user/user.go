@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	gojwt "github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -76,7 +77,7 @@ func (uc *UserController) Login() echo.HandlerFunc {
 			})
 		}
 
-		strToken, err := jwt.GenerateJWT()
+		strToken, err := jwt.GenerateJWT(result.ID)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]any{
 				"message": "terjadi permasalahan ketika mengenkripsi data",
@@ -98,6 +99,13 @@ func (uc *UserController) Login() echo.HandlerFunc {
 
 func (uc *UserController) GetListUser() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return c.JSON(http.StatusOK, "return data")
+		userid, err := jwt.ExtractToken(c.Get("user").(*gojwt.Token))
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, map[string]any{
+				"message": "tidak ada kuasa untuk mengakses",
+			})
+		}
+
+		return c.JSON(http.StatusOK, userid)
 	}
 }

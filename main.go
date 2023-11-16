@@ -2,6 +2,7 @@ package main
 
 import (
 	"19api/config"
+	"19api/controller/barang"
 	"19api/controller/user"
 	"19api/model"
 	"19api/routes"
@@ -102,10 +103,12 @@ func main() {
 
 	db.AutoMigrate(&model.UserModel{}, &model.BarangModel{})
 
-	model := model.UserQuery{DB: db}
-	userController := user.UserController{Model: model}
+	m := model.UserQuery{DB: db}
+	userController := user.UserController{Model: m}
 
-	routes.InitRoute(e, userController)
+	bm := model.BarangQuery{DB: db}
+	barangController := barang.BarangController{Model: bm}
+	routes.InitRoute(e, userController, barangController)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }
