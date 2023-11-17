@@ -1,15 +1,15 @@
 package routes
 
 import (
-	"19api/controller/barang"
-	"19api/controller/user"
+	"19api/features/barang"
+	"19api/features/users"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitRoute(e *echo.Echo, uc user.UserController, bc barang.BarangController) {
+func InitRoute(e *echo.Echo, uc users.Handler, bc barang.Handler) {
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -19,12 +19,12 @@ func InitRoute(e *echo.Echo, uc user.UserController, bc barang.BarangController)
 	routeBarang(e, bc)
 }
 
-func routeUser(e *echo.Echo, uc user.UserController) {
+func routeUser(e *echo.Echo, uc users.Handler) {
 	e.POST("/users", uc.Register())
 	e.POST("/login", uc.Login())
-	e.GET("/users", uc.GetListUser(), echojwt.JWT([]byte("$!1gnK3yyy!!!")))
+	// e.GET("/users", uc.GetListUser(), echojwt.JWT([]byte("$!1gnK3yyy!!!")))
 }
 
-func routeBarang(e *echo.Echo, bc barang.BarangController) {
-	e.POST("/barangs", bc.Register(), echojwt.JWT([]byte("$!1gnK3yyy!!!")))
+func routeBarang(e *echo.Echo, bc barang.Handler) {
+	e.POST("/barangs", bc.Add(), echojwt.JWT([]byte("$!1gnK3yyy!!!")))
 }

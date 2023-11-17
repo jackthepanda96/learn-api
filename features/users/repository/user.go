@@ -1,17 +1,28 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"19api/features/barang/repository"
+	"19api/features/users"
+
+	"gorm.io/gorm"
+)
 
 type UserModel struct {
 	gorm.Model
 	Nama     string
 	Hp       string
 	Password string
-	Barangs  []BarangModel `gorm:"foreignKey:UserID"`
+	Barangs  []repository.BarangModel `gorm:"foreignKey:UserID"`
 }
 
-type UserQuery struct {
-	DB *gorm.DB
+type userQuery struct {
+	db *gorm.DB
+}
+
+func New(db *gorm.DB) users.Repository {
+	return &userQuery{
+		db: db,
+	}
 }
 
 // func (uq *UserQuery) Register(newUser UserModel) bool {
@@ -20,20 +31,33 @@ type UserQuery struct {
 // 	}
 // }
 
-func (uq *UserQuery) Register(newUser UserModel) (UserModel, error) {
-	if err := uq.DB.Create(&newUser).Error; err != nil {
-		return UserModel{}, err
+func (uq *userQuery) Insert(newUser users.User) (users.User, error) {
+	var inputDB = new(UserModel)
+	inputDB.Hp = newUser.HP
+	inputDB.Nama = newUser.Nama
+	inputDB.Password = newUser.Password
+
+	if err := uq.db.Create(&inputDB).Error; err != nil {
+		return users.User{}, err
 	}
+
+	newUser.ID = inputDB.ID
 
 	return newUser, nil
 }
 
-func (uq *UserQuery) Login(hp string, password string) (UserModel, error) {
-	var result = new(UserModel)
+func (uq *userQuery) Login(hp string) (users.User, error) {
+	var userData = new(UserModel)
 
-	if err := uq.DB.Where("hp = ? AND password = ?", hp, password).First(result).Error; err != nil {
-		return UserModel{}, err
+	if err := uq.db.Where("hp = ?", hp).First(userData).Error; err != nil {
+		return users.User{}, err
 	}
+
+	var result = new(users.User)
+	result.ID = userData.ID
+	result.HP = userData.Hp
+	result.Nama = userData.Nama
+	result.Password = userData.Password
 
 	return *result, nil
 }

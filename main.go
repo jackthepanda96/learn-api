@@ -2,10 +2,14 @@ package main
 
 import (
 	"19api/config"
-	"19api/controller/barang"
-	"19api/controller/user"
-	"19api/model"
+	bh "19api/features/barang/handler"
+	br "19api/features/barang/repository"
+	bs "19api/features/barang/services"
+	uh "19api/features/users/handler"
+	ur "19api/features/users/repository"
+	us "19api/features/users/services"
 	"19api/routes"
+
 	"19api/utils/database"
 	"net/http"
 	"strings"
@@ -101,14 +105,23 @@ func main() {
 		return
 	}
 
-	db.AutoMigrate(&model.UserModel{}, &model.BarangModel{})
+	db.AutoMigrate(&ur.UserModel{}, &br.BarangModel{})
 
-	m := model.UserQuery{DB: db}
-	userController := user.UserController{Model: m}
+	// m := model.UserQuery{DB: db}
+	// userController := user.UserController{Model: m}
 
-	bm := model.BarangQuery{DB: db}
-	barangController := barang.BarangController{Model: bm}
-	routes.InitRoute(e, userController, barangController)
+	// bm := model.BarangQuery{DB: db}
+	// barangController := barang.BarangController{Model: bm}
+
+	userRepo := ur.New(db)
+	userService := us.New(userRepo)
+	userHandler := uh.New(userService)
+
+	barangRepo := br.New(db)
+	barabgService := bs.New(barangRepo)
+	barangHandler := bh.New(barabgService)
+
+	routes.InitRoute(e, userHandler, barangHandler)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }

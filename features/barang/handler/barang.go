@@ -37,13 +37,16 @@ func (bc *BarangHandler) Add() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Error("ERROR Register, explain:", err.Error())
-			if strings.Contains(err.Error(), "duplicate") {
-				return c.JSON(http.StatusBadRequest, map[string]any{
-					"message": "data yang diinputkan sudah terdaftar ada sistem",
-				})
+			var statusCode = http.StatusInternalServerError
+			var message = "terjadi permasalahan ketika memproses data"
+
+			if strings.Contains(err.Error(), "terdaftar") {
+				statusCode = http.StatusBadRequest
+				message = "data yang diinputkan sudah terdaftar ada sistem"
 			}
-			return c.JSON(http.StatusInternalServerError, map[string]any{
-				"message": "terjadi permasalahan ketika memproses data",
+
+			return c.JSON(statusCode, map[string]any{
+				"message": message,
 			})
 		}
 

@@ -1,6 +1,10 @@
 package repository
 
-import "gorm.io/gorm"
+import (
+	"19api/features/barang"
+
+	"gorm.io/gorm"
+)
 
 type BarangModel struct {
 	gorm.Model
@@ -10,14 +14,28 @@ type BarangModel struct {
 	UserID     uint
 }
 
-type BarangQuery struct {
+type barangQuery struct {
 	db *gorm.DB
 }
 
-func (bq *BarangQuery) AddBarang(newBarang BarangModel) (BarangModel, error) {
-	if err := bq.db.Create(&newBarang).Error; err != nil {
-		return BarangModel{}, err
+func New(db *gorm.DB) barang.Repo {
+	return &barangQuery{
+		db: db,
 	}
+}
+
+func (bq *barangQuery) InsertBarang(userID uint, newBarang barang.Barang) (barang.Barang, error) {
+	var inputData = new(BarangModel)
+	inputData.UserID = userID
+	inputData.NamaBarang = newBarang.Nama
+	inputData.Harga = newBarang.Harga
+	inputData.Stok = newBarang.Stok
+
+	if err := bq.db.Create(&inputData).Error; err != nil {
+		return barang.Barang{}, err
+	}
+
+	newBarang.ID = inputData.ID
 
 	return newBarang, nil
 }
