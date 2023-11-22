@@ -8,6 +8,7 @@ import (
 	uh "19api/features/users/handler"
 	ur "19api/features/users/repository"
 	us "19api/features/users/services"
+	"19api/helper/enkrip"
 	"19api/routes"
 
 	"19api/utils/database"
@@ -112,9 +113,9 @@ func main() {
 
 	// bm := model.BarangQuery{DB: db}
 	// barangController := barang.BarangController{Model: bm}
-
+	hash := enkrip.New()
 	userRepo := ur.New(db)
-	userService := us.New(userRepo)
+	userService := us.New(userRepo, hash)
 	userHandler := uh.New(userService)
 
 	barangRepo := br.New(db)

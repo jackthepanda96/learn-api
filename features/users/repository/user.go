@@ -1,4 +1,4 @@
-package model
+package repository
 
 import (
 	"19api/features/barang/repository"
